@@ -1,4 +1,4 @@
-import pyaudio //must install first
+import pyaudio # (MUST INSTALL FIRST)
 import wave
 
 form_1 = pyaudio.paInt16 # 16-bit resolution
@@ -7,7 +7,7 @@ samp_rate = 44100 # 44.1kHz sampling rate
 chunk = 4096 # 2^12 samples for buffer
 record_secs = 10 # seconds to record
 dev_index = 2 # device index found by p.get_device_info_by_index(ii) (THIS MAY CHANGE DEPENDING ON THE PI)
-wav_output_filename = 'TeamTwelveAudio.wav' # name of .wav file 
+wav_output_filename = 'TeamTwelveAudio.wav' # name of .wav file (ARBITRARY)
 
 audio = pyaudio.PyAudio() # create pyaudio instantiation
 
