@@ -19,7 +19,7 @@ CHUNK = 1024  # Chunks of bytes to read each time from mic
 FORMAT = pyaudio.paInt16
 THECHANNELS = 1
 SAMPLERATE = 16000
-PRE_AUDIO = 0.5  # Seconds to prepend
+PREPEND_AUDIO = 0.5  # Seconds to prepend
 
 def mainTask(threshold=SILENCE_MAX_VOLUME):
     p = pyaudio.PyAudio()
@@ -33,36 +33,36 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
     print("* Listening mic. ")
     finalAudio = []
     curChunk = ''  # current chunk  of audio data
-    slid_win = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
+    silenceDeq = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
     #---Prepend audio from 0.5 seconds before noise was detected
-    pre_audio = deque(maxlen=math.floor(PRE_AUDIO * (RATE/CHUNK)))
-    started = False # used to control whether or not user has started the recording
-    response = []
+    pre_audio = deque(maxlen=math.floor(PREPEND_AUDIO * (RATE/CHUNK)))
+    began = False # used to control whether or not user has started the recording
+    response = [] #(WHY NEEDED?)
 
     while (True):
         curChunk = stream.read(CHUNK)
-        slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
-        #print slid_win[-1]
-        if(sum([x > SILENCE_MAX_VOLUME for x in slid_win]) > 0):
-            if(not started):
+        silenceDeq.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
+        #---Print silenceDeq[-1]
+        if(sum([x > SILENCE_MAX_VOLUME for x in silenceDeq]) > 0):
+            if(not began):
                 print ("Recording beginning...")
-                started = True
+                began = True
             finalAudio.append(curChunk)
-        elif (started is True):
+        elif (began is True):
             stream.stop_stream()
             print ("Finished recording.")
-            #(NEED DEFINITION) filename = save_speech(list(pre_audio) + finalAudio, p)
+            filename = saveFile(list(pre_audio) + finalAudio, p)
             #(NEED DEFINITION) p = stt_google_wav(filename)
             if p == "exit":
                 break
-            # Remove temp file. Comment line to review.
+            #---Remove temp file
             os.remove(filename)
-            # Reset all
-            started = False
-            slid_win = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
+            #---Reset all
+            began = False
+            silenceDeq = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
             pre_audio = deque(maxlen=math.floor(0.5 * (RATE/CHUNK)))
             finalAudio = []
-            # (NEED DEFINITION) stream.start_stream()
+            #(NEED DEFINITION) stream.start_stream()
             print ("Listening ...")
         else:
             pre_audio.append(curChunk)
@@ -70,3 +70,15 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
     print ("exiting")
     p.terminate()
     return
+
+def saveFile(data, audio):
+    filename = 'output_'+str(int(time.time()))
+    #---Write data to WAV file
+    data = b''.join(data)
+    wf = wave.open(filename + '.wav', 'wb')
+    wf.setnchannels(THECHANNELS)
+    wf.setsampwidth(audio.get_sample_size(FORMAT))
+    wf.setframerate(SAMPLERATE)  # TODO make this value a function parameter?
+    wf.writeframes(data)
+    wf.close()
+    return filename + '.wav'
