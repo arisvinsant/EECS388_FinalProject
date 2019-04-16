@@ -22,16 +22,16 @@ SAMPLERATE = 16000
 PREPEND_AUDIO = 0.5  # Seconds to prepend
 
 def mainTask(threshold=SILENCE_MAX_VOLUME):
-    p = pyaudio.PyAudio()
+    audio = pyaudio.PyAudio()
     #---Create pyaudio stream
-    stream = p.open(format=FORMAT,
+    stream = audio.open(format=FORMAT,
                     channels=THECHANNELS,
                     rate=SAMPLERATE,
                     input=True,
                     frames_per_buffer=CHUNK)
 
     print("* Listening mic. ")
-    finalAudio = []
+    finAudio = []
     curChunk = ''  # current chunk  of audio data
     silenceDeq = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
     #---Prepend audio from 0.5 seconds before noise was detected
@@ -47,11 +47,11 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
             if(not began):
                 print ("Recording beginning...")
                 began = True
-            finalAudio.append(curChunk)
+            finAudio.append(curChunk)
         elif (began is True):
             stream.stop_stream()
             print ("Finished recording.")
-            filename = saveFile(list(pre_audio) + finalAudio, p)
+            filename = saveFile(list(pre_audio) + finAudio, p)
             #(NEED DEFINITION) p = stt_google_wav(filename)
             if p == "exit":
                 break
@@ -61,7 +61,7 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
             began = False
             silenceDeq = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
             pre_audio = deque(maxlen=math.floor(0.5 * (RATE/CHUNK)))
-            finalAudio = []
+            finAudio = []
             #(NEED DEFINITION) stream.start_stream()
             print ("Listening ...")
         else:
