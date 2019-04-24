@@ -83,7 +83,7 @@ def saveFile(data, audio):
     wf.close()
     return filename + '.wav'
 
-def audio_int(num_samples=50):
+def audio_int(num_samples=50):   #just a testing function, ignore
     print ("Getting intensity values from mic.")
     p = pyaudio.PyAudio()
 
