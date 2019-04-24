@@ -82,3 +82,59 @@ def saveFile(data, audio):
     wf.writeframes(data)
     wf.close()
     return filename + '.wav'
+
+def audio_int(num_samples=50):
+    print ("Getting intensity values from mic.")
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    values = [math.sqrt(abs(audioop.avg(stream.read(CHUNK), 4)))
+              for x in range(num_samples)]
+    values = sorted(values, reverse=True)
+    r = sum(values[:int(num_samples * 0.2)]) / int(num_samples * 0.2)
+    print (" Finished ")
+    print (" Average audio intensity is ", r)
+    stream.close()
+    p.terminate()
+    return r
+
+def stt_google_wav(audio_fname):
+    print ("Sending ", audio_fname)
+    #Convert to flac first
+    with open(audio_fname, 'rb') as stream:
+        sample = client.sample(stream=stream,
+                               encoding=speech.Encoding.LINEAR16,
+                               sample_rate_hertz=16000)
+        results = sample.streaming_recognize(language_code='en-US')
+        for result in results:
+            for alternative in result.alternatives:
+                print('=' * 20)
+                print('transcript: ' + alternative.transcript)
+                print('confidence: ' + str(alternative.confidence))
+                if alternative.transcript == "exit":
+                    return "exit"
+                if alternative.transcript == "light on":
+                    wiringpi.digitalWrite(4,1)
+                if alternative.transcript == "lights on":
+                    wiringpi.digitalWrite(4,1)
+                if alternative.transcript == "light off":
+                    wiringpi.digitalWrite(4,0)
+                if alternative.transcript == "lights off":
+                    wiringpi.digitalWrite(4,0)
+
+
+if(__name__ == '__main__'):
+    try:
+        wiringpi.wiringPiSetupGpio()
+    except:
+        print ("GPIO issue", sys.exc_info()[0])
+
+    wiringpi.pinMode(4,1)
+    wiringpi.digitalWrite(4,0)
+
+    mainTask()
