@@ -10,10 +10,11 @@ from collections import deque
 import os
 import time
 import math
+from google.cloud import speech
 
 SILENCE_MAX_VOLUME = 1500  # The sound intensity that defines silence
 SILENCE_STOP_TIME = 3  # Silence limit in seconds to stop the recording
-client = speech.Client()
+client = speech.SpeechClient()
 LANG_CODE = 'en-US'
 CHUNK = 1024  # Chunks of bytes to read each time from mic
 FORMAT = pyaudio.paInt16
