@@ -53,7 +53,7 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
             stream.stop_stream()
             print ("Finished recording.")
             filename = saveFile(list(pre_audio) + finAudio, p)
-            #(NEED DEFINITION) p = stt_google_wav(filename)
+            p = stt_google_wav(filename)
             if p == "exit":
                 break
             #---Remove temp file
@@ -63,7 +63,7 @@ def mainTask(threshold=SILENCE_MAX_VOLUME):
             silenceDeq = deque(maxlen=math.floor(SILENCE_STOP_TIME * (RATE/CHUNK)))
             pre_audio = deque(maxlen=math.floor(0.5 * (RATE/CHUNK)))
             finAudio = []
-            #(NEED DEFINITION) stream.start_stream()
+            stream.start_stream()
             print ("Listening ...")
         else:
             pre_audio.append(curChunk)
