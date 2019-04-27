@@ -7,8 +7,9 @@ form_1 = pyaudio.paInt16 # 16-bit resolution
 theChans = 1 # 1 channel
 samp_rate = 44100 # 44.1kHz sampling rate
 chunk = 4096 # 2^12 samples for buffer
-record_secs = 10 # seconds to record (CHANGE THIS TO STOP RECORDING AFTER 2-3 SECONDS OF SILENCE)
-dev_index = 2 # device index found by p.get_device_info_by_index(ii) (THIS MAY CHANGE DEPENDING ON THE PI)
+record_secs = 10 # seconds to record
+dev_index = 2 # device index found by p.get_device_info_by_index(ii) 
+#^ this will change, we need to get this before we start
 output_filename = 'teamTwelveAudio.wav' # name of .wav file (ARBITRARY)
 
 audio = pyaudio.PyAudio() # create pyaudio instantiation
@@ -64,3 +65,5 @@ def transcribe_file(speech_file):
     for result in response.results:
         # The first alternative is the most likely one for this portion.
         print(u'Transcript: {}'.format(result.alternatives[0].transcript))
+        
+transcribe_file(output_filename) #this may need to be changed
