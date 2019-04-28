@@ -10,6 +10,7 @@ from collections import deque
 import os
 import time
 import math
+import google.cloud
 from google.cloud import speech
 
 SILENCE_MAX_VOLUME = 1500  # The sound intensity that defines silence
