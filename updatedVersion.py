@@ -2,6 +2,8 @@
 
 import pyaudio
 import wave
+import io
+import os
 
 form_1 = pyaudio.paInt16 # 16-bit resolution
 theChans = 1 # 1 channel
@@ -43,27 +45,19 @@ wavefile.close() #(OUTPUT FILE, USE THIS TO PASS INTO THE API FOR TRANSLATION)
 
 #--------------------------------Transcribe section-------------------------------------------
 
-def transcribe_file(speech_file):
-    """Transcribe the given audio file."""
-    from google.cloud import speech
-    from google.cloud.speech import enums
-    from google.cloud.speech import types
-    client = speech.SpeechClient()
+import speech_recognition as sr
 
-    with io.open(speech_file, 'rb') as audio_file:
-        content = audio_file.read()
+r = sr.Recognizer()
 
-    audio = types.RecognitionAudio(content=content)
-    config = types.RecognitionConfig(
-        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code='en-US')
+audio = 'teamTwelveAudio.wav'
 
-    response = client.recognize(config, audio)
-    # Each result is for a consecutive portion of the audio. Iterate through
-    # them to get the transcripts for the entire audio file.
-    for result in response.results:
-        # The first alternative is the most likely one for this portion.
-        print(u'Transcript: {}'.format(result.alternatives[0].transcript))
-        
-transcribe_file(teamTwelveAudio.wav) #this may need to be changed
+with sr.AudioFile(audio) as source:
+    audio = r.record(source)
+    print ('Done!')
+    
+try:
+    text = r.recognize_google(audio)
+    print (text)
+    
+except Exception as e:
+    print (e)
